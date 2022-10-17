@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from ast import literal_eval
 import pmdarima as pm
 import datetime
 import numpy as np
@@ -16,7 +17,9 @@ end = int(datetime.datetime.now().timestamp() - 60 * 60 * 3)
 start = datetime.datetime.now().timestamp() - 60 * 60 * 24 * 7
 step = 3600
 
-arima_model = pm.ARIMA(order=(1,1,0),seasonal_order=(2,1,0,24))
+order = literal_eval(os.environ.get("ARIMA_ORDER"))
+seasonal_order = literal_eval(os.environ.get("ARIMA_SEASONAL_ORDER"))
+arima_model = pm.ARIMA(order=order,seasonal_order=seasonal_order)
 res = requests.get(query_range + "?query={}&start={}&end={}&step={}".format(query, start, end, step))
 data = json.loads(res.content)
 values = data["data"]["result"][0]["values"]
