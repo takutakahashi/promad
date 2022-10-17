@@ -13,12 +13,7 @@ async def root():
 
 @app.get("/metrics")
 async def metrics():
-    after_h = 24 * 7
-    y = np.zeros(after_h)
-    now = datetime.datetime.now().timestamp()
-    y[0] = now
-    for t in range(1, after_h):
-        y[t] = y[t-1] + 3600
+    y = []
     arima_model.fit(y=y)
     print(arima_model.summary())
     predict, conf_int = arima_model.predict(return_conf_int=True)
