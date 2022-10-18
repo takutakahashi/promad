@@ -5,19 +5,22 @@ import datetime
 import lib.lib as lib
 
 app = FastAPI()
-
+print(lib.parse_rules())
 order, seasonal_order = lib.arima_orders()
-arima_model = pm.ARIMA(order=order,seasonal_order=seasonal_order)
-arima_model.fit(y=lib.val_to_series(lib.query_range()))
+#models = {v["name"]: pm.ARIMA(order=order, seasonal_order=seasonal_order).fit(
+#    lib.query_range(v["query"])) for v in lib.parse_rules()}
+models = {v["name"]: pm.ARIMA(order=order, seasonal_order=seasonal_order).fit(y=lib.val_to_series(lib.query_range(v["query"]))) for v in lib.parse_rules()}
+
 
 @app.get("/")
 async def root():
     return {"message": "hello"}
 
+
 @app.get("/metrics")
 async def metrics():
-    predict, conf_int = arima_model.predict(n_periods=12, return_conf_int=True)
-    predict_time, predict_value, ci = lib.find_by_time_from_predict(predict, conf_int)
+    predict, conf_int = models["pod_cpu"].predict(n_periods=12, return_conf_int=True)
+    predict_time, predict_value, ci = lib.find_current_value(predict, conf_int)
     value = lib.query_current()
     return {
         "predict": {

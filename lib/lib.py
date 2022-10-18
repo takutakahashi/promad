@@ -4,6 +4,7 @@ import datetime
 import requests
 import json
 import pandas as pd
+import yaml
 
 def env_defined():
     os.environ.get("PROM_API_URL") and \
@@ -27,10 +28,9 @@ def val_to_series(values):
     x = [datetime.datetime.fromtimestamp(v[0]) for v in values]
     return pd.Series(y, index=x)
 
-def query_range():
+def query_range(query):
     prom_api_url = os.environ.get("PROM_API_URL")
     query_range = prom_api_url + "/query_range"
-    query = os.environ.get("QUERY")
     end = int(datetime.datetime.now().timestamp() - 60 * 60 * 3)
     start = datetime.datetime.now().timestamp() - 60 * 60 * 24 * 7
     step = 3600
@@ -39,7 +39,7 @@ def query_range():
     values = data["data"]["result"][0]["values"]
     return values
 
-def find_by_time_from_predict(predict, conf_int):
+def find_current_value(predict, conf_int):
     now = datetime.datetime.now()
     i = 0
     for k, v in predict.items():
@@ -49,3 +49,8 @@ def find_by_time_from_predict(predict, conf_int):
 
 def to_exporter_metrics(d):
     return ""
+
+def parse_rules():
+    with open(os.environ.get("RULES_PATH")) as f:
+      return yaml.safe_load(f)
+    
