@@ -1,12 +1,15 @@
+import os
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 
 import lib.lib as lib
 
+
 app = FastAPI()
 
-app.models = lib.fit_model()
-
+@app.on_event("startup")
+async def startup_event():
+  app.models = lib.fit_model()
 
 @app.get("/")
 async def root():

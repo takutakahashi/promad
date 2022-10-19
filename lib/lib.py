@@ -9,10 +9,11 @@ import pmdarima as pm
 
 
 def env_defined():
-    os.environ.get("PROM_API_URL") and \
-        os.environ.get("QUERY") and \
-        os.environ.get("ARIMA_ORDER") and \
-        os.environ.get("ARIMA_SEAZONAL_ORDER")
+    if os.environ.get("PROM_API_URL") == "":
+        return "env PROM_API_URL is not defined. ex: http://localhost:9090/api/v1"
+    if os.environ.get("RULES_PATH") == "":
+        return "env RULES_PATH is not defined. ex: /path/to/rules.yaml"
+    return ""
 
 
 def arima_orders():
