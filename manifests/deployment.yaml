@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: promad
+  name: promad
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: promad
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9400"
+      labels:
+        app: promad
+    spec:
+      volumes:
+      - name: rules
+        configMap:
+          name: rules
+      containers:
+      - name: fit
+        image: curlimages/curl
+        command:
+          - sh
+          - -c
+          - "while true; do sleep 3600; curl -X POST http://localhost:9400/fit; done"
+      - name: exporter
+        image: ghcr.io/takutakahashi/promad:v0.1.0
+        env:
+        - name: PROM_API_URL
+          value: http://prometheus:9090/api/v1
+        - name: RULES_PATH
+          value: /promad/rules.yaml
+        volumeMounts:
+          - name: rules
+            mountPath: /promad
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9400
+          failureThreshold: 1
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9400
+          failureThreshold: 1
+          periodSeconds: 10
