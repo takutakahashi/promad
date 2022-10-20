@@ -20,10 +20,9 @@ def arima_orders():
     return literal_eval(os.environ.get("ARIMA_ORDER")), literal_eval(os.environ.get("ARIMA_SEASONAL_ORDER"))
 
 
-def query_current():
+def query_current(query):
     prom_api_url = os.environ.get("PROM_API_URL")
     query_api = prom_api_url + "/query"
-    query = os.environ.get("QUERY")
     res = requests.get(query_api + "?query={}".format(query))
     if os.environ.get("PROMAD_DEBUG") == "true":
         print(res.status_code)

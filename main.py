@@ -10,6 +10,7 @@ app = FastAPI()
 @app.on_event("startup")
 async def startup_event():
   app.models = lib.fit_model()
+  app.rules = lib.parse_rules()
 
 @app.get("/")
 async def root():
@@ -29,7 +30,8 @@ async def metrics():
         predict, conf_int = model.predict(
             n_periods=12, return_conf_int=True)
         _, predict_value, ci = lib.find_current_value(predict, conf_int)
-        value = lib.query_current()
+        query = list(filter(lambda x: x["name"] == k, app.rules))[0]["query"]
+        value = lib.query_current(query)
         ret[k] = {
             "predict": {
                 "value": predict_value,
