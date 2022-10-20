@@ -61,26 +61,42 @@ def find_current_value(predict, conf_int):
         print(predict)
         print("=== conf_int ===")
         print(conf_int)
+    selected_conf_int, selected_k, selected_v = None, None, None
     for k, v in predict.items():
-        if (now - k).seconds < 1000:
-            return k, v, conf_int[i]
+        if selected_k is None:
+            selected_k = k
+            selected_v = v
+            selected_conf_int = conf_int[i]
+        if os.environ.get("PROMAD_DEBUG"):
+            print("------")
+            print(k)
+            print(abs((now - k).seconds))
+            print(selected_k)
+            print(abs((now - selected_k).seconds))
+            print(i)
+            print("------")
+        if abs((now - k).seconds) < abs((now - selected_k).seconds):
+            selected_k = k
+            selected_v = v
+            selected_conf_int = conf_int[i]
         i += 1
+    return selected_k, selected_v, selected_conf_int
 
 
 def to_exporter_metrics(d):
     ret = []
     for metric_name, data in d.items():
-        ret.append('promad_anomaly{name=\"%s\", type="range_max"} %f' % (
+        ret.append('promad_anomaly_band{name=\"%s\", type="range_max"} %f' % (
             metric_name, data["predict"]["range_max"]))
-        ret.append('promad_anomaly{name=\"%s\", type="range_min"} %f' % (
+        ret.append('promad_anomaly_band{name=\"%s\", type="range_min"} %f' % (
             metric_name, data["predict"]["range_min"]))
-        ret.append('promad_anomaly{name=\"%s\", type="predicted"} %f' %
-                   (metric_name, data["predict"]["value"]))
-        ret.append('promad_anomaly{name=\"%s\" type="actual"} %s' %
+        ret.append('promad_anomaly_band{name=\"%s\" type="actual"} %s' %
                    (metric_name, data["actual"]["value"]))
-        ret.append('promad_anomaly{name=\"%s\", type="error"} %f' % (metric_name, abs((float(
+        ret.append('promad_anomaly_info{name=\"%s\", type="predicted"} %f' %
+                   (metric_name, data["predict"]["value"]))
+        ret.append('promad_anomaly_info{name=\"%s\", type="error"} %f' % (metric_name, abs((float(
             data["actual"]["value"]) - data["predict"]["value"])/data["predict"]["value"])))
-        ret.append('promad_anomaly{name=\"%s\", type="anomaly_detected"} %f' % (
+        ret.append('promad_anomaly_detected{name=\"%s\"} %f' % (
             metric_name, data["actual"]["out_of_range"]))
     return "\n".join(ret)
 
