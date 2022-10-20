@@ -28,7 +28,7 @@ spec:
         command:
           - sh
           - -c
-          - "while true; do sleep 3600; curl -X POST http://localhost:9400/fit; done"
+          - "sleep 15; while true; do curl -X POST http://localhost:9400/fit; sleep 3600; done"
       - name: exporter
         image: ghcr.io/takutakahashi/promad:v0.1.0
         env:

@@ -56,6 +56,11 @@ def query_range(query):
 def find_current_value(predict, conf_int):
     now = datetime.datetime.now()
     i = 0
+    if os.environ.get("PROMAD_DEBUG"):
+        print("=== predict ===")
+        print(predict)
+        print("=== conf_int ===")
+        print(conf_int)
     for k, v in predict.items():
         if (now - k).seconds < 1000:
             return k, v, conf_int[i]
@@ -65,17 +70,17 @@ def find_current_value(predict, conf_int):
 def to_exporter_metrics(d):
     ret = []
     for metric_name, data in d.items():
-        ret.append('promad_predict_max{name=\"%s\"} %f' % (
+        ret.append('promad_anomaly{name=\"%s\", type="range_max"} %f' % (
             metric_name, data["predict"]["range_max"]))
-        ret.append('promad_predict_min{name=\"%s\"} %f' % (
+        ret.append('promad_anomaly{name=\"%s\", type="range_min"} %f' % (
             metric_name, data["predict"]["range_min"]))
-        ret.append('promad_predict{name=\"%s\"} %f' %
+        ret.append('promad_anomaly{name=\"%s\", type="predicted"} %f' %
                    (metric_name, data["predict"]["value"]))
-        ret.append('promad_actual{name=\"%s\"} %s' %
+        ret.append('promad_anomaly{name=\"%s\" type="actual"} %s' %
                    (metric_name, data["actual"]["value"]))
-        ret.append('promad_error_rate{name=\"%s\"} %f' % (metric_name, abs((float(
+        ret.append('promad_anomaly{name=\"%s\", type="error"} %f' % (metric_name, abs((float(
             data["actual"]["value"]) - data["predict"]["value"])/data["predict"]["value"])))
-        ret.append('promad_anomaly_detect{name=\"%s\"} %f' % (
+        ret.append('promad_anomaly{name=\"%s\", type="anomaly_detected"} %f' % (
             metric_name, data["actual"]["out_of_range"]))
     return "\n".join(ret)
 

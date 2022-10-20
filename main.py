@@ -9,7 +9,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup_event():
-  app.models = lib.fit_model()
+  app.models = {}
   app.rules = lib.parse_rules()
 
 @app.get("/")
