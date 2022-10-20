@@ -25,6 +25,9 @@ def query_current():
     query_api = prom_api_url + "/query"
     query = os.environ.get("QUERY")
     res = requests.get(query_api + "?query={}".format(query))
+    if os.environ.get("PROMAD_DEBUG") == "true":
+        print(res.status_code)
+        print(res.content)
     data = json.loads(res.content)
     return data["data"]["result"][0]["value"]
 
@@ -43,6 +46,9 @@ def query_range(query):
     step = 3600
     res = requests.get(
         query_range + "?query={}&start={}&end={}&step={}".format(query, start, end, step))
+    if os.environ.get("PROMAD_DEBUG") == "true":
+        print(res.status_code)
+        print(res.content)
     data = json.loads(res.content)
     values = data["data"]["result"][0]["values"]
     return values
