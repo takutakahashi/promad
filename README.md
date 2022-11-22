@@ -12,8 +12,7 @@ https://speakerdeck.com/takutakahashi/sikiizhi-jian-shi-karanozu-ye-prometheus-n
 
 Prometheus query, ARIMA param, Seasonal param is required.
 
-TODO: Add how to get reasonable ARIMA param
-
+See https://github.com/takutakahashi/promad/blob/main/notebook/arima.ipynb for seeking ARIMA parameters.
 ```
 - query: up
   order: (1,0,0)
