@@ -2,7 +2,7 @@
 
 Anomaly Detection exporter with Prometheus metrics
 
-If you want to get more details, please see below presentation! (Japanese)
+More details, please see below presentation! (Japanese)
 
 https://speakerdeck.com/takutakahashi/sikiizhi-jian-shi-karanozu-ye-prometheus-niyoruji-jie-xue-xi-woyong-itayi-chang-jian-zhi-aratonoshi-zhuang
 
@@ -10,7 +10,9 @@ https://speakerdeck.com/takutakahashi/sikiizhi-jian-shi-karanozu-ye-prometheus-n
 
 ### Write config
 
-Prometheus query, ARIMA param, Seasonal param is needed.
+Prometheus query, ARIMA param, Seasonal param is required.
+
+TODO: Add how to get reasonable ARIMA param
 
 ```
 - query: up
